@@ -1,12 +1,19 @@
 import base64
+import os
 
 import cohere
 import requests
+from dotenv import load_dotenv
 
-co = cohere.ClientV2()
+load_dotenv()
+
+COHERE_API_KEY = os.getenv("COHERE_API_KEY")
 
 
-async def generate_image_embedding(image_url: str):
+co = cohere.ClientV2(COHERE_API_KEY)
+
+
+async def generate_image_embeddings(image_url: str):
     image = requests.get(image_url)
     stringified_buffer = base64.b64encode(image.content).decode("utf-8")
     content_type = image.headers["Content-Type"]
