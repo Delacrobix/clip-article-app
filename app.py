@@ -1,14 +1,14 @@
 import asyncio
+import base64
+from io import BytesIO
 
 import streamlit as st
 from PIL import Image
 
-from services.cohere_embed import (
-    generate_image_embeddings as cohere_generate_embeddings,
-)
+from services.cohere_embed import generate_image_embeddings as embed_generate_embeddings
 from services.elasticsearch import knn_search
 from services.jina_clip_v1 import generate_image_embeddings as jina_generate_embeddings
-from services.openai_clip import generate_image_embeddings as openai_generate_embeddings
+from services.openai_clip import generate_image_embeddings as clip_generate_embeddings
 
 st.title("Image Search")
 
@@ -48,7 +48,7 @@ search_button = st.markdown(
             display: block;
         }
     </style>
-""",
+    """,
     unsafe_allow_html=True,
 )
 
@@ -63,8 +63,8 @@ if st.button("Search"):
                 image_data = image
 
             openai_result, cohere_result, jina_result = await asyncio.gather(
-                openai_generate_embeddings(image_data),
-                cohere_generate_embeddings(image_data),
+                clip_generate_embeddings(image_data),
+                embed_generate_embeddings(image_data),
                 jina_generate_embeddings(image_data),
             )
 
@@ -73,37 +73,45 @@ if st.button("Search"):
         results = asyncio.run(fetch_embeddings())
         openai_result, cohere_result, jina_result, image_data = results
 
+        if image_data:
+            st.image(image_data, caption="Uploaded Image", use_container_width=True)
+
         if openai_result and cohere_result and jina_result:
 
-            knn_search_results = knn_search("clip-images", openai_result, 5)
+            clip_search_results = knn_search("clip-images", openai_result, 5)
+            jina_search_results = knn_search("jina-images", jina_result, 5)
+            embed_search_results = knn_search("embed-images", cohere_result, 5)
 
-            st.write("KNN Search Results")
-            st.write(knn_search_results["hits"]["hits"])
-            # for hit in knn_search_results["hits"]["hits"]:
-            #     st.image(hit["_source"]["image_name"], use_container_width=True)
+            clip_search_results = clip_search_results["hits"]["hits"]
+            jina_search_results = jina_search_results["hits"]["hits"]
+            embed_search_results = embed_search_results["hits"]["hits"]
 
             st.subheader("Search Results")
-            col1, col2, col3 = st.columns(3)
+            col1, spacer1, col2, spacer2, col3 = st.columns([3, 0.2, 3, 0.2, 3])
 
             with col1:
                 st.write("CLIP")
-                st.write(openai_result)
-                # for img in openai_result:
-                #     st.image(img, use_container_width=True)
+
+                for hit in clip_search_results:
+                    image_data = base64.b64decode(hit["_source"]["image_data"])
+                    image = Image.open(BytesIO(image_data))
+                    st.image(image, use_container_width=True)
 
             with col2:
                 st.write("JinaCLIP")
-                st.write(jina_result)
-                # for img in jina_result:
-                #     st.image(img, use_container_width=True)
+
+                for hit in jina_search_results:
+                    image_data = base64.b64decode(hit["_source"]["image_data"])
+                    image = Image.open(BytesIO(image_data))
+                    st.image(image, use_container_width=True)
 
             with col3:
                 st.write("Cohere")
-                st.write(cohere_result)
-                # for img in cohere_result:
-                #     st.image(img, use_container_width=True)
 
-        if image_data:
-            st.image(image_data, caption="Uploaded Image", use_container_width=True)
+                for hit in embed_search_results:
+                    image_data = base64.b64decode(hit["_source"]["image_data"])
+                    image = Image.open(BytesIO(image_data))
+                    st.image(image, use_container_width=True)
+
     else:
         st.warning("Please upload an image or type text to search.")

@@ -38,7 +38,8 @@ def index_images(index_name: str, images_obj_arr: list):
 
 def knn_search(index_name: str, query_vector: list, k: int):
     query = {
-        "_source": ["image_embedding", "image_name"],
+        "size": 4,
+        "_source": ["image_name", "image_data"],
         "query": {
             "knn": {
                 "field": "image_embedding",

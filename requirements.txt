@@ -10,6 +10,8 @@ charset-normalizer==3.4.0
 click==8.1.7
 cohere==5.11.3
 einops==0.8.0
+elastic-transport==8.15.1
+elasticsearch==8.15.0
 fastavro==1.9.7
 filelock==3.16.1
 fsspec==2024.10.0
