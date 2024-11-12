@@ -34,5 +34,5 @@ async def generate_image_embeddings(image: Image.Image):
         return response.embeddings.float_[0]
 
     except Exception as e:
-        print(f"Error al procesar la imagen: {e}")
+        print(f"Error generating embeddings: {e}")
         return None
