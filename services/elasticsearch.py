@@ -16,10 +16,15 @@ es_client = Elasticsearch(
 
 
 def index_images(index_name: str, images_obj_arr: list):
+
     actions = [
         {
             "_index": index_name,
-            "_source": obj,
+            "_source": {
+                "image_data": obj["image_data"],
+                "image_name": obj["image_name"],
+                "image_embedding": obj["image_embedding"],
+            },
         }
         for obj in images_obj_arr
     ]
@@ -36,10 +41,11 @@ def knn_search(index_name: str, query_vector: list, k: int):
         "_source": ["image_embedding", "image_name"],
         "query": {
             "knn": {
-                "image_embeddings": {
-                    "vector": query_vector,
-                    "k": k,
-                }
+                "field": "image_embedding",
+                "query_vector": query_vector,
+                "k": k,
+                "num_candidates": 100,
+                "boost": 10,
             }
         },
     }
