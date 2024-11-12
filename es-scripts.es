@@ -12,7 +12,7 @@ PUT clip-images
       },
       "image_embedding": {
         "type": "dense_vector",
-        "dims": 512,
+        "dims": 768,
         "index": "true",
         "similarity": "cosine"
       }
@@ -34,13 +34,14 @@ PUT embed-images
       },
       "image_embedding": {
         "type": "dense_vector",
-        "dims": 512,
+        "dims": 1024,
         "index": "true",
         "similarity": "cosine"
       }
     }
   }
 }
+
 
 PUT jina-images
 {
@@ -56,7 +57,7 @@ PUT jina-images
       },
       "image_embedding": {
         "type": "dense_vector",
-        "dims": 512,
+        "dims": 768,
         "index": "true",
         "similarity": "cosine"
       }
