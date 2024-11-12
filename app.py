@@ -89,29 +89,27 @@ if st.button("Search"):
             st.subheader("Search Results")
             col1, spacer1, col2, spacer2, col3 = st.columns([3, 0.2, 3, 0.2, 3])
 
-            with col1:
-                st.write("CLIP")
-
-                for hit in clip_search_results:
+            def print_results(results):
+                for hit in results:
                     image_data = base64.b64decode(hit["_source"]["image_data"])
                     image = Image.open(BytesIO(image_data))
                     st.image(image, use_container_width=True)
+                    st.write("score: ", hit["_score"])
+
+            with col1:
+                st.write("CLIP")
+
+                print_results(clip_search_results)
 
             with col2:
                 st.write("JinaCLIP")
 
-                for hit in jina_search_results:
-                    image_data = base64.b64decode(hit["_source"]["image_data"])
-                    image = Image.open(BytesIO(image_data))
-                    st.image(image, use_container_width=True)
+                print_results(jina_search_results)
 
             with col3:
                 st.write("Cohere")
 
-                for hit in embed_search_results:
-                    image_data = base64.b64decode(hit["_source"]["image_data"])
-                    image = Image.open(BytesIO(image_data))
-                    st.image(image, use_container_width=True)
+                print_results(embed_search_results)
 
     else:
         st.warning("Please upload an image or type text to search.")
