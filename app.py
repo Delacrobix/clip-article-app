@@ -1,6 +1,4 @@
 import asyncio
-import base64
-from io import BytesIO
 
 import streamlit as st
 from PIL import Image
@@ -8,6 +6,7 @@ from PIL import Image
 from services.cohere_embed import (
     generate_image_embeddings as cohere_generate_embeddings,
 )
+from services.elasticsearch import knn_search
 from services.jina_clip_v1 import generate_image_embeddings as jina_generate_embeddings
 from services.openai_clip import generate_image_embeddings as openai_generate_embeddings
 
@@ -75,6 +74,13 @@ if st.button("Search"):
         openai_result, cohere_result, jina_result, image_data = results
 
         if openai_result and cohere_result and jina_result:
+
+            knn_search_results = knn_search("clip-images", openai_result, 5)
+
+            st.write("KNN Search Results")
+            st.write(knn_search_results["hits"]["hits"])
+            # for hit in knn_search_results["hits"]["hits"]:
+            #     st.image(hit["_source"]["image_name"], use_container_width=True)
 
             st.subheader("Search Results")
             col1, col2, col3 = st.columns(3)
