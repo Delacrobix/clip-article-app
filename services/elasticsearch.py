@@ -56,3 +56,16 @@ def knn_search(index_name: str, query_vector: list, k: int):
         return response
     except exceptions.ConnectionError as e:
         return e
+
+
+def get_all_query(index_name: str):
+    query = {
+        "size": 400,
+        "source": ["image_name", "image_data"],
+        "query": {"match_all": {}},
+    }
+
+    try:
+        return es_client.search(index=index_name, body=query)
+    except exceptions.ConnectionError as e:
+        return e
