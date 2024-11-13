@@ -66,7 +66,7 @@ async def main():
             )
 
         except Exception as e:
-            print(f"Error al abrir {filename}: {e}")
+            print(f"Error with {filename}: {e}")
 
     print("Indexing images in Elasticsearch...")
 

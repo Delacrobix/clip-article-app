@@ -15,6 +15,9 @@ PUT clip-images
         "dims": 768,
         "index": "true",
         "similarity": "cosine"
+      },
+      "image_data": {
+        "type": "binary"
       }
     }
   }
@@ -37,6 +40,9 @@ PUT embed-images
         "dims": 1024,
         "index": "true",
         "similarity": "cosine"
+      },
+      "image_data":{
+        "type": "binary"
       }
     }
   }
@@ -60,6 +66,9 @@ PUT jina-images
         "dims": 768,
         "index": "true",
         "similarity": "cosine"
+      },
+      "image_data": {
+        "type": "binary"
       }
     }
   }

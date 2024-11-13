@@ -30,8 +30,7 @@ def index_images(index_name: str, images_obj_arr: list):
     ]
 
     try:
-        response = helpers.bulk(es_client, actions)
-        return response
+        return helpers.bulk(es_client, actions)
     except exceptions.ConnectionError as e:
         return e
 
