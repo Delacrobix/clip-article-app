@@ -5,10 +5,25 @@ from io import BytesIO
 import streamlit as st
 from PIL import Image
 
-from services.cohere_embed import generate_image_embeddings as embed_generate_embeddings
+from services.cohere_embed import (
+    generate_image_embeddings as embed_generate_image_embeddings,
+)
+from services.cohere_embed import (
+    generate_text_embeddings as embed_generate_text_embeddings,
+)
 from services.elasticsearch import get_all_query, knn_search
-from services.jina_clip_v1 import generate_image_embeddings as jina_generate_embeddings
-from services.openai_clip import generate_image_embeddings as clip_generate_embeddings
+from services.jina_clip_v1 import (
+    generate_image_embeddings as jina_generate_image_embeddings,
+)
+from services.jina_clip_v1 import (
+    generate_text_embeddings as jina_generate_text_embeddings,
+)
+from services.openai_clip import (
+    generate_image_embeddings as clip_generate_image_embeddings,
+)
+from services.openai_clip import (
+    generate_text_embeddings as clip_generate_text_embeddings,
+)
 
 if "selected_view" not in st.session_state:
     st.session_state.selected_view = "Index"
@@ -77,16 +92,26 @@ if st.session_state.selected_view == "Index":
         if uploaded_image or input_text:
 
             async def fetch_embeddings():
-                image_data = None
+                data = None
+
                 if uploaded_image:
                     image = Image.open(uploaded_image)
-                    image_data = image
+                    data = image
+                elif input_text:
+                    data = input_text
 
-                openai_result, cohere_result, jina_result = await asyncio.gather(
-                    clip_generate_embeddings(image_data),
-                    embed_generate_embeddings(image_data),
-                    jina_generate_embeddings(image_data),
-                )
+                if uploaded_image:
+                    openai_result, cohere_result, jina_result = await asyncio.gather(
+                        clip_generate_image_embeddings(data),
+                        embed_generate_image_embeddings(data),
+                        jina_generate_image_embeddings(data),
+                    )
+                elif input_text:
+                    openai_result, cohere_result, jina_result = await asyncio.gather(
+                        clip_generate_text_embeddings(data),
+                        embed_generate_text_embeddings(data),
+                        jina_generate_text_embeddings(data),
+                    )
 
                 return openai_result, cohere_result, jina_result
 

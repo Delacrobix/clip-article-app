@@ -15,3 +15,16 @@ async def generate_image_embeddings(image: Image.Image):
     except Exception as e:
         print(f"Error generating embeddings: {e}")
         return None
+
+
+async def generate_text_embeddings(description: str):
+    try:
+        inputs = processor([description], padding=True, return_tensors="pt")
+
+        outputs = model.get_text_features(**inputs)
+
+        return outputs.detach().cpu().numpy().flatten().tolist()
+
+    except Exception as e:
+        print(f"Error generating embeddings: {e}")
+        return None

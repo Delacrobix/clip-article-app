@@ -36,3 +36,19 @@ async def generate_image_embeddings(image: Image.Image):
     except Exception as e:
         print(f"Error generating embeddings: {e}")
         return None
+
+
+async def generate_text_embeddings(description: str):
+    try:
+        response = co.embed(
+            texts=[description],
+            model="embed-english-v3.0",
+            input_type="classification",
+            embedding_types=["float"],
+        )
+
+        return response.embeddings.float_[0]
+
+    except Exception as e:
+        print(f"Error generating embeddings: {e}")
+        return None
